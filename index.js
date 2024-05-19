@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const app = express()
 const port = process.env.PORT || 5000
@@ -29,9 +29,23 @@ async function run() {
         const database = client.db("ceramicsAndPotterysDB");
         const ceramicsAndPotteryCollection = database.collection("ceramicsAndPottery");
 
+        app.get('/crafts', async(req, res)=>{
+            const cursor=ceramicsAndPotteryCollection.find()
+            const result=await cursor.toArray();
+            res.send(result);
+        })
+
         app.post('/crafts', async(req, res)=>{
             const craft=req.body;
             const result = await ceramicsAndPotteryCollection.insertOne(craft);
+            res.send(result);
+        })
+
+        app.delete('/crafts/:id', async(req, res)=>{
+            const id=req.params.id;
+            console.log(id);
+            const query={_id: new ObjectId(id)}
+            const result=await ceramicsAndPotteryCollection.deleteOne(query);
             res.send(result);
         })
         // Send a ping to confirm a successful connection
